@@ -255,8 +255,8 @@ else:
                             st.session_state.material += 8
                             event_msg += " 식량 10개와 자재 8개를 획득했습니다!"
 
-                        # 🌟 동료 조우 확률 대폭 상향 (70% 적용)
-                        if random.random() < 0.70 and len(st.session_state.survivors) < 7:
+                        # 🌟 동료 조우 확률 원복 (35% 적용)
+                        if random.random() < 0.35 and len(st.session_state.survivors) < 7:
                             available_recruits = [k for k in ALL_POSSIBLE_RECRUITS.keys() if k not in st.session_state.survivors]
                             if available_recruits:
                                 new_friend = random.choice(available_recruits)
