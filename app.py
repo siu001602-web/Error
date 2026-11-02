@@ -72,14 +72,11 @@ def process_night_turn():
         # 3. 극단적 사건 (동료 감염 또는 위기 선택지) 이벤트 발생 확률
         event_roll = random.random()
         
-        # 동료가 2명 이상이고, 감염 이벤트가 발생할 확률 (30%)
         if event_roll < 0.3 and len(st.session_state.survivors) > 1:
-            # 플레이어("나")를 제외한 동료 중 무작위 감염자 선정
             potential_infected = [n for n in st.session_state.survivors.keys() if n != "나 (플레이어)"]
             if potential_infected:
                 infected_target = random.choice(potential_infected)
                 st.session_state.log.append(f"🚨 **[긴급 위기]** 야간 경계 중, **{infected_target}**(이)가 좀비에게 물려 **바이러스에 감염**된 사실이 밝혀졌습니다!")
-                # 감염 플래그를 세션에 저장하여 다음 낮 턴에 선택지를 띄움
                 st.session_state.infected_crisis = infected_target
         elif event_roll > 0.8:
             crisis_type = random.choice(["약탈자", "들쥐 떼", "이상 기온"])
@@ -163,11 +160,10 @@ else:
                     del st.session_state.survivors[infected_person]
                 st.session_state.log.append(f"💔 눈물을 머금고 감염된 **{infected_person}**을(를) 쉘터 밖으로 내쫓았습니다...")
                 st.session_state.infected_crisis = None
-                st.rerurn()
+                st.rerun()
         with col_opt2:
             if st.button("💊 남은 식량/의약품을 몰아주어 치료를 시도한다 (식량 -10)", use_container_width=True, disabled=st.session_state.food < 10):
                 st.session_state.food -= 10
-                # 50% 확률로 완치 혹은 사망
                 if random.random() < 0.5:
                     st.session_state.log.append(f"✨ 기적처럼 **{infected_person}**이(가) 감염을 이겨내고 완치되었습니다!")
                 else:
@@ -175,7 +171,7 @@ else:
                         del st.session_state.survivors[infected_person]
                     st.session_state.log.append(f"☠️ 안타깝게도 치료에 실패하여 **{infected_person}**을(를) 잃었습니다...")
                 st.session_state.infected_crisis = None
-                st.rerurn()
+                st.rerun()
         st.divider()
 
     # --- 낮 턴 / 밤 턴 UI 분기 ---
@@ -198,9 +194,9 @@ else:
                         found_food += 8
                     st.session_state.food += found_food
                     
-                    # 탐험 시 새로운 동료 조우 판정 (40% 확률)
                     event_msg = f"🛒 마트를 수색해 식량 {found_food}개를 획득했습니다."
-                    if random.option := (random.random() < 0.4) and len(st.session_state.survivors) < 6:
+                    meet_chance = (random.random() < 0.4) and (len(st.session_state.survivors) < 6)
+                    if meet_chance:
                         available_recruits = [k for k in ALL_POSSIBLE_RECRUITS.keys() if k not in st.session_state.survivors]
                         if available_recruits:
                             new_friend = random.choice(available_recruits)
@@ -222,7 +218,8 @@ else:
                     st.session_state.material += found_mat
                     
                     event_msg = f"🏗️ 공사장에서 자재 {found_mat}개를 수집했습니다."
-                    if random.random() < 0.4 and len(st.session_state.survivors) < 6:
+                    meet_chance = (random.random() < 0.4) and (len(st.session_state.survivors) < 6)
+                    if meet_chance:
                         available_recruits = [k for k in ALL_POSSIBLE_RECRUITS.keys() if k not in st.session_state.survivors]
                         if available_recruits:
                             new_friend = random.choice(available_recruits)
@@ -246,7 +243,8 @@ else:
                         )
                     
                     event_msg = f"🏥 병원에서 팀원의 체력이 {heal_amt} 회복되었습니다."
-                    if random.random() < 0.45 and len(st.session_state.survivors) < 6:
+                    meet_chance = (random.random() < 0.45) and (len(st.session_state.survivors) < 6)
+                    if meet_chance:
                         available_recruits = [k for k in ALL_POSSIBLE_RECRUITS.keys() if k not in st.session_state.survivors]
                         if available_recruits:
                             new_friend = random.choice(available_recruits)
