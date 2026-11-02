@@ -89,16 +89,16 @@ def process_night_turn():
                 data["hp"] = min(data["max_hp"], data["hp"] + 15)
             st.session_state.log.append("🩺 의무병 현우가 밤사이에 동료들의 부상을 치료해 체력을 회복시켰습니다.")
 
-        # 3. 돌발 사건 및 감염 이벤트 (확률 대폭 하향 조정 및 다양화)
+        # 3. 돌발 사건 및 감염 이벤트
         event_roll = random.random()
         
-        if event_roll < 0.12 and len(st.session_state.survivors) > 1:  # 감염 확률 낮춤 (12%)
+        if event_roll < 0.12 and len(st.session_state.survivors) > 1:
             potential_infected = [n for n in st.session_state.survivors.keys() if n != "나 (플레이어)"]
             if potential_infected:
                 infected_target = random.choice(potential_infected)
                 st.session_state.log.append(f"🚨 **[긴급 위기]** 야간 경계 중, **{infected_target}**(이)가 바이러스에 감염되었습니다!")
                 st.session_state.infected_crisis = infected_target
-        elif event_roll > 0.65:  # 자연재해 및 특수 재난 이벤트
+        elif event_roll > 0.65:
             disaster = random.choice(["폭우 붕괴", "들쥐 떼 습격", "강력한 좀비 무리 침입", "의문의 화재"])
             if disaster == "폭우 붕괴":
                 st.session_state.defense = max(5, st.session_state.defense - 8)
@@ -188,7 +188,7 @@ else:
         with col_opt2:
             if st.button("💊 의약품을 몰아주어 치료 시도 (식량 -10)", use_container_width=True, disabled=st.session_state.food < 10):
                 st.session_state.food -= 10
-                if random.random() < 0.6:  # 치료 성공 확률 상향
+                if random.random() < 0.6:
                     st.session_state.log.append(f"✨ 기적처럼 **{infected_person}**이(가) 감염을 이겨내고 완치되었습니다!")
                 else:
                     if infected_person in st.session_state.survivors:
@@ -209,7 +209,6 @@ else:
             st.markdown("### 오늘 수색 가능한 지역 (랜덤 3곳)")
             st.caption("매번 탐색할 때마다 무작위 지역이 나타납니다. 원하시는 곳을 선택하세요!")
             
-            # 세션에 랜덤 지역 3개 고정 (턴마다 갱신되도록)
             if "current_random_locations" not in st.session_state or st.session_state.get("refreshed_loc") != st.session_state.day:
                 st.session_state.current_random_locations = random.sample(list(ALL_LOCATIONS.keys()), 3)
                 st.session_state.refreshed_loc = st.session_state.day
@@ -223,7 +222,6 @@ else:
                     if st.button(f"탐사하기", key=f"loc_{idx}", use_container_width=True):
                         event_msg = f"🗺️ {loc_name} 탐사 완료."
                         
-                        # 지역 타입별 보상 로직
                         if loc_info["type"] == "food":
                             f_found = random.randint(18, 28)
                             st.session_state.food += f_found
@@ -257,8 +255,8 @@ else:
                             st.session_state.material += 8
                             event_msg += " 식량 10개와 자재 8개를 획득했습니다!"
 
-                        # 새로운 동료 조우 확률 (35% 확률)
-                        if random.random() < 0.35 and len(st.session_state.survivors) < 7:
+                        # 🌟 동료 조우 확률 대폭 상향 (70% 적용)
+                        if random.random() < 0.70 and len(st.session_state.survivors) < 7:
                             available_recruits = [k for k in ALL_POSSIBLE_RECRUITS.keys() if k not in st.session_state.survivors]
                             if available_recruits:
                                 new_friend = random.choice(available_recruits)
